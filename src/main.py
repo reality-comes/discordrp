@@ -62,13 +62,13 @@ async def select_embeddings_cmd(interaction: discord.Interaction, choice: str):
     else:
         await interaction.response.send_message("Invalid choice. Please choose 'local' or 'openai'.")
 
-@tree.command(name='set_system_message', description='Set a system message for the conversation')
+@tree.command(name='set_character_prompt', description='Set a prompt for the selected character')
 async def set_system_message_cmd(interaction: discord.Interaction, message: str):
     # Update the system message in the character's config
     character_config = character_manager.load_character_config(bot_name)  # Load current config
     character_config['system_message'] = message  # Update system message
     character_manager.save_character_config(bot_name, character_config)  # Save the updated config
-    await interaction.response.send_message(f"System message for {bot_name} set to: {message}")
+    await interaction.response.send_message(f"Prompt for {bot_name} set to: {message}")
 
 @tree.command(name='select_api', description='Select the API to use')
 async def select_api(interaction: discord.Interaction, api_name: str):
@@ -109,13 +109,13 @@ async def set_message_history(interaction: discord.Interaction, history: int):
     save_config(bot_config)
     await interaction.response.send_message(f"Chat history length set to: {history}")
 
-@tree.command(name='set_temperature', description='Change the temperature for the bot 0.0 - 1.0')
+@tree.command(name='set_temperature', description='Change the temperature for the model 0.0 - 1.0')
 async def set_temperature(interaction: discord.Interaction, temp: float):
     bot_config['temperature'] = temp
     save_config(bot_config)
-    await interaction.response.send_message(f"Changed bot temperature to: {temp}")
+    await interaction.response.send_message(f"Changed model temperature to: {temp}")
 
-@tree.command(name='set_bot_name', description='Set a new name for the bot for API interactions')
+@tree.command(name='select_character', description='Select a character, if the character does not exist it will be created')
 async def set_bot_name(interaction: discord.Interaction, new_name: str):
     global bot_name
     bot_name = new_name
@@ -125,7 +125,7 @@ async def set_bot_name(interaction: discord.Interaction, new_name: str):
     bot_config['bot_name'] = new_name
     # Optionally save the bot_config if you need to persist changes made during this session
     save_config(bot_config)
-    await interaction.response.send_message(f"Changed bot's name to: {new_name}. Loaded specific configurations for {new_name}.")
+    await interaction.response.send_message(f"Changed character to: {new_name}. Loaded specific configurations for {new_name}.")
 
 @tree.command(name='set_roleplay_setting', description='Set the setting for the roleplay')
 async def set_roleplay_setting(interaction: discord.Interaction, setting: str):
@@ -163,6 +163,7 @@ async def delete_logs_and_messages(interaction: discord.Interaction, count: str)
 async def on_ready():
     client_name = client.user.name
     print(f"Logged in as {client_name}")
+    print(bot_config)
     print(BOT_INVITE_URL)
     await tree.sync()
 
