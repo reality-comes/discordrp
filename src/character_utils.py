@@ -44,6 +44,6 @@ class CharacterManager:
         This can be expanded based on what default values you need.
         """
         return {
-            'system_message': 'This is a default system message.',
+            'system_message': 'You are a character in a roleplay.',
             # Add more default settings as needed
         }
