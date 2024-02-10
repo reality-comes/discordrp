@@ -1,0 +1,17 @@
+{
+    "current_embeddings_choice": "openai",
+    "response_api_config": {
+        "name": "local",
+        "url": "http://localhost:5001/api/v1/generate",
+        "headers": {
+            "accept": "application/json",
+            "Content-Type": "application/json"
+        }
+    },
+    "bot_name": "Narrator",
+    "roleplay_setting": "Tomorrowland",
+    "stopping_strings": [
+        "[user]",
+        "[assisstant]"
+    ]
+}
