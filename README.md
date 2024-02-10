@@ -33,7 +33,7 @@ Setup:
 
 1. Create a new Discord application
 2. Turn ON Message content intent
-3. Input token/client information in example.env
+3. Input token/client/server information in example.env *Token/client ID come from Discord application, Server ID comes from the Discord client (right-click on the server icon and it should be at the bottom of the popup menu)
 4. Rename example.env to be .env
 5. Create an OpenAI account and generate an API Key
 6. Input OpenAI Key into .env
