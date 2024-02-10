@@ -76,6 +76,13 @@ Bot Commands:
 
 Tips:
 
+The default prompts are there to make the bot function out of the box, I suggest rewriting them for your use case. The Narrator character works really well for me, I recommend using it but changing the prompt to include more details about what you want the Narrator to do.
+
+For lower system harware I recommend, openchat-3.5-1210.Q8_0
+
+For high end hardware, Miqu 70b varients.
+
+
 
 
 
