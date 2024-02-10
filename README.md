@@ -48,16 +48,23 @@ Setup:
 Bot Commands:
 
 /set_system_message - Sets the primary portion of the prompt, this tells the LLM what you want it to do, this is where you input the character information and how the character should behave
+
 /set_bot_name - Sets the name the bot will use for the next message, if its a new name you should /set_system_message to provide details for the new character
+
 /set_roleplay_setting - This is optional, provides a fixed (or changing) setting information for the RP. Very important if you're switching characters often to maintain the setting details (when and where)
+
 /delete_logs_and_messages - This deletes the input number of logs and messages from the server, important if you want to rewind the conversation or get a bad generation. 
 
 /set_max_length - Sets the length of the response for the LLM, defaults to 200.
+
 /set_message_history - Sets the number of past messages to include in the prompt, defaults to 20. The higher the better,but consider your hardware and the context length of the LLM and how long you want to wait for a response.
+
 /set_temperature - Sets the temperature for the LLM, defaults to .9
+
 /add_stopping_string - Adds stopping strings that will stop the LLM generation. Use this if the LLM is responding in ways you don't want, usually things like [user] will crop up from time to time, I probably can fix most of this later.
 
 /select_api - "openai" OR "local", discussed above.
+
 /set_response_url - Use this if you need to change where the API is listening, for instance if you're using cloudflare or LAN or change the KoboldCPP port.
 
 
