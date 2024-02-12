@@ -1,6 +1,7 @@
 import discord
 from discord import app_commands
 import os
+import json
 from src.bot_utils import setup_logging, setup_client, setup_command_tree
 from src.config import DISCORD_BOT_TOKEN, BOT_INVITE_URL, bot_config, save_config
 from src.api_handler import call_api
@@ -115,17 +116,30 @@ async def set_temperature(interaction: discord.Interaction, temp: float):
     save_config(bot_config)
     await interaction.response.send_message(f"Changed model temperature to: {temp}")
 
-@tree.command(name='select_character', description='Select a character, if the character does not exist it will be created')
-async def set_bot_name(interaction: discord.Interaction, new_name: str):
+@tree.command(name='select_character', description='Select a character and assign an emoji to it')
+@app_commands.describe(new_name='The name of the character', emoji='An emoji to represent the character')
+async def select_character(interaction: discord.Interaction, new_name: str, emoji: str):
     global bot_name
     bot_name = new_name
     # Load character configuration for the new bot_name
     character_config = character_manager.load_character_config(bot_name)
-    # Update bot_config with the loaded character configuration
+    
+    # Update the character configuration with the emoji
+    character_config['emoji'] = emoji  # Assume there's a field for emoji in your character configuration
+    
+    # Save the updated character configuration
+    character_manager.save_character_config(bot_name, character_config)
+    
+    # Update bot_config with the loaded character configuration including the emoji
     bot_config['bot_name'] = new_name
-    # Optionally save the bot_config if you need to persist changes made during this session
+    bot_config['emoji'] = emoji  # Optionally save the emoji in bot_config if needed
+    
+    # Save the bot_config to persist changes
     save_config(bot_config)
-    await interaction.response.send_message(f"Changed character to: {new_name}. Loaded specific configurations for {new_name}.")
+    
+    # Inform the user about the change including the selected emoji
+    await interaction.response.send_message(f"Changed character to: {new_name} {emoji}. Loaded specific configurations for {new_name}.")
+
 
 @tree.command(name='set_roleplay_setting', description='Set the setting for the roleplay')
 async def set_roleplay_setting(interaction: discord.Interaction, setting: str):
@@ -135,13 +149,13 @@ async def set_roleplay_setting(interaction: discord.Interaction, setting: str):
     await interaction.response.send_message(f"Roleplay setting updated to: {setting}")
 
 @tree.command(name='delete_logs_and_messages', description='Delete logs and messages from the channel')
-@app_commands.describe(count='Number of logs/messages to delete from 1 to 100')
+@app_commands.describe(count='Number of logs/messages to delete from 1 to 99')
 async def delete_logs_and_messages(interaction: discord.Interaction, count: str):
     # Convert and validate count
     try:
         count = int(count)
-        if not 1 <= count <= 100:
-            raise ValueError("Count must be between 1 and 100.")
+        if not 1 <= count <= 99:
+            raise ValueError("Count must be between 1 and 99.")
     except ValueError as e:
         await interaction.response.send_message(f"Error: {str(e)}", ephemeral=True)
         return
@@ -231,7 +245,44 @@ async def on_message(message):
     else:
          log_message("Bot", api_response)  # Fallback if bot_name is not yet set
 
+@client.event
+async def on_reaction_add(reaction, user):
+    # Avoid processing reactions from the bot itself or any bot user
+    if user.bot:
+        return
 
+    # Loop through all character files to find a matching emoji
+    for filename in os.listdir(character_manager.characters_dir):
+        if filename.endswith(".json"):
+            with open(os.path.join(character_manager.characters_dir, filename), 'r') as file:
+                character_config = json.load(file)
+                # Check if the emoji matches the character's emoji
+                if character_config.get('emoji') == str(reaction.emoji):
+                    character_name = os.path.splitext(filename)[0]  # Extract character name without .json
+                    
+                    # Update the global bot_name to switch the bot's context
+                    global bot_name
+                    bot_name = character_name
+                    
+                    # Update bot_config with the new character's configuration
+                    bot_config['bot_name'] = character_name
+                    for key, value in character_config.items():
+                        bot_config[key] = value  # Update bot_config with all character config values
+                    
+                    # Save the updated bot_config to persist changes
+                    save_config(bot_config)
+                    
+                    # Provide feedback to the user
+                    await reaction.message.channel.send(f"Switched character to: {bot_name} {character_config.get('emoji')}")
+                    
+                    # Optional: Remove the reaction after processing
+                    try:
+                        await reaction.remove(user)
+                    except discord.errors.Forbidden:
+                        # Bot doesn't have permissions to remove reactions
+                        pass
+                    
+                    break  # Exit the loop once the matching character is found
 
 # Run the client
 client.run(DISCORD_BOT_TOKEN)

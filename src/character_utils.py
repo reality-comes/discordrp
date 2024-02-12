@@ -27,7 +27,11 @@ class CharacterManager:
     def save_character_config(self, bot_name, config):
         """
         Save the character configuration to a JSON file.
+        Ensures that an emoji is included in the configuration; if not, adds a default one.
         """
+        # Ensure there's an emoji key in the config; if not, use a default emoji
+        if 'emoji' not in config:
+            config['emoji'] = '🙂'  # Default emoji, change as needed
         file_path = self._get_character_file_path(bot_name)
         with open(file_path, 'w') as file:
             json.dump(config, file, indent=4)
@@ -40,10 +44,11 @@ class CharacterManager:
 
     def _default_config(self):
         """
-        Returns a default character configuration.
+        Returns a default character configuration including a default emoji.
         This can be expanded based on what default values you need.
         """
         return {
             'system_message': 'You are a character in a roleplay.',
+            'emoji': '🙂',  # Default emoji for new characters
             # Add more default settings as needed
         }
