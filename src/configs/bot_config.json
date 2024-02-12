@@ -12,6 +12,6 @@
     "roleplay_setting": "Tomorrowland",
     "stopping_strings": [
         "[user]",
-        "[assisstant]"
+        "[assistant]"
     ]
 }
